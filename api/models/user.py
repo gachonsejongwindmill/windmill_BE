@@ -11,5 +11,6 @@ class User(AbstractBaseModel):
     email : Mapped[str] = mapped_column(unique=True)
     password : Mapped[str] = mapped_column(nullable=False)
     
+    refresh_token = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")
     def __str__(self) -> str:
         return self.username
