@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, Response
+from fastapi import APIRouter, Depends, status, Response, Request
 from sqlalchemy.orm import Session
 
 from api.responses.success_response import success_response
@@ -28,3 +28,16 @@ async def user_login(user: UserLogin, response: Response, db: Session = Depends(
         message="유저가 성공적으로 로그인했습니다.",
         data=data
     )
+
+@auth.post("/refresh-token", status_code=status.HTTP_200_OK)
+def refresh_token(request: Request, db: Session = Depends(get_db)):
+    access_token = auth_service.handle_refresh_token(request, db)
+    return success_response(
+        message="access token이 재발급되었습니다.",
+        data={"access_token": access_token, "token_type": "bearer"}
+    )
+
+@auth.post("/logout", status_code=status.HTTP_200_OK)
+async def logout(request: Request, response: Response, db: Session = Depends(get_db)):
+    auth_service.handle_logout(db, request, response)
+    return success_response(message="로그아웃 되었습니다.")
