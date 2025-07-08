@@ -18,8 +18,8 @@ load_dotenv()
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated = 'auto')
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHMN = os.environ.get("ALGORITHM")
-REFRESH_TOKEN_EXPIRE_DAYS = int(os.environ.get("REFRESH_TOKEN_EXPIRE_DAYS"))
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES"))
+REFRESH_TOKEN_EXPIRE_DAYS = int(os.environ.get("REFRESH_TOKEN_EXPIRE_DAYS",7))
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES",15))
 db_dependency = Annotated[Session,Depends(get_db)]
 
 class AuthService:
