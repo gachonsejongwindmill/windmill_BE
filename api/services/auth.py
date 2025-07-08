@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 
 from datetime import datetime, timedelta
-from jose import jwt
+from jose import jwt, JWTError
 from typing import Annotated
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status, Response, Request
@@ -17,7 +17,7 @@ load_dotenv()
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated = 'auto')
 SECRET_KEY = os.environ.get("SECRET_KEY")
-ALGORITHMN = os.environ.get("ALGORITHM")
+ALGORITHM = os.environ.get("ALGORITHM")
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.environ.get("REFRESH_TOKEN_EXPIRE_DAYS",7))
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES",15))
 db_dependency = Annotated[Session,Depends(get_db)]
@@ -65,15 +65,41 @@ class AuthService:
     def verify_password(self, password: str, hashed_password) -> bool:
         return bcrypt_context.verify(password,hashed_password)
     
+    def handle_refresh_token(self, request: Request, db: Session) -> str:
+        token = request.cookies.get("refresh_token")
+        if not token:
+            raise HTTPException(status_code=401, detail="Refresh token이 없습니다.")
+
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            user_id: str = payload.get("sub")
+            if user_id is None:
+                raise HTTPException(status_code=401, detail="유효하지 않은 토큰입니다.")
+        except JWTError:
+            raise HTTPException(status_code=401, detail="토큰 디코딩에 실패했습니다.")
+
+        db_token = db.query(RefreshToken).filter(RefreshToken.token == token).first()
+
+        if not db_token:
+            raise HTTPException(status_code=401, detail="DB에 존재하지 않는 refresh token입니다.")
+
+        if db_token.expiry_time < datetime.utcnow():
+            db.delete(db_token)
+            db.commit()
+            raise HTTPException(status_code=401, detail="Refresh token이 만료되었습니다.")
+
+        access_token = self.create_access_token(user_id)
+        return access_token
+
     def create_access_token(self, user_id: str) -> str:
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         payload = {"sub": str(user_id), "exp": expire}
-        return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHMN)
+        return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     
     def create_refresh_token(self, user_id: str) -> str:
         expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
         payload = {"sub": str(user_id), "exp": expire}
-        return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHMN)
+        return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     
     def set_refresh_token_cookie(self, response: Response, token: str):
         response.set_cookie(

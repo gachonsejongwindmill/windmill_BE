@@ -29,6 +29,14 @@ async def user_login(user: UserLogin, response: Response, db: Session = Depends(
         data=data
     )
 
+@auth.post("/refresh-token", status_code=status.HTTP_200_OK)
+def refresh_token(request: Request, db: Session = Depends(get_db)):
+    access_token = auth_service.handle_refresh_token(request, db)
+    return success_response(
+        message="access token이 재발급되었습니다.",
+        data={"access_token": access_token, "token_type": "bearer"}
+    )
+
 @auth.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(request: Request, response: Response, db: Session = Depends(get_db)):
     auth_service.handle_logout(db, request, response)
