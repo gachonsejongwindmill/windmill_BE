@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Response
 from sqlalchemy.orm import Session
 
 from api.responses.success_response import success_response
 from api.services.user import user_service
-from api.schemas.user import UserCreate
+from api.services.auth import auth_service
+from api.schemas.user import UserCreate,UserLogin
 from api.utils.dependency import get_db
 
 
@@ -15,6 +16,15 @@ async def user_register(user: UserCreate, db : Session = Depends(get_db)):
 
     return success_response(
         status_code=status.HTTP_201_CREATED,
-        message="User created successfully",
+        message="유저가 성공적으로 생성됐습니다.",
+        data=data
+    )
+
+@auth.post("/login",status_code=status.HTTP_200_OK)
+async def user_login(user: UserLogin, response: Response, db: Session = Depends(get_db)):
+    data = auth_service.handle_login(db, user, response)
+
+    return success_response(
+        message="유저가 성공적으로 로그인했습니다.",
         data=data
     )

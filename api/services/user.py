@@ -7,7 +7,7 @@ from fastapi import Depends, status, HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from typing import Annotated
+from typing import Annotated, Optional
 
 from api.utils.dependency import get_db
 from api.schemas.user import UserCreate, UserOut
@@ -62,6 +62,8 @@ class UserService:
             ) 
         return UserOut.model_validate(user)
     
+    def get_user_by_email(self, db: db_dependency, email: str) -> Optional[User]:
+        return db.query(User).filter(User.email == email).first()
 user_service = UserService()
     
     
