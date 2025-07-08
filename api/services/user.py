@@ -19,6 +19,7 @@ db_dependency = Annotated[Session,Depends(get_db)]
 
 class UserService:
     def create_user(self,user_create: UserCreate, db : db_dependency):
+        
         if self.email_exist(db, user_create.email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

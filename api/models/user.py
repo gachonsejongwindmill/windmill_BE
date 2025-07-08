@@ -7,7 +7,7 @@ from api.models.abstract import AbstractBaseModel
 
 class User(AbstractBaseModel):
     __tablename__ = 'user'
-    username : Mapped[str] = mapped_column(unique=True)
+    username : Mapped[str]
     email : Mapped[str] = mapped_column(unique=True)
     password : Mapped[str] = mapped_column(nullable=False)
     
