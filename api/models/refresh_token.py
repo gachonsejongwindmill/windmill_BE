@@ -12,10 +12,6 @@ class RefreshToken(AbstractBaseModel):
     expiry_time: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False
     )
-    blacklisted: Mapped[bool] = mapped_column(
-        Boolean(), server_default=text("false"), default=False
-    )
-
     user = relationship("User", back_populates="refresh_token")
     
 
