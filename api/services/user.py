@@ -52,7 +52,7 @@ class UserService:
         return UserOut.model_validate(user)
 
     def email_exist(self, db : db_dependency, email : str) -> bool:
-        db.query(User).filter(User.email == email).first() is not None
+        return db.query(User).filter(User.email == email).first() is not None
     
     def get_user_detail(self, db : db_dependency, user_id : str):
         user = db.query(User).filter(User.id==user_id).first()
