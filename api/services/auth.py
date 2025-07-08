@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from jose import jwt
 from typing import Annotated
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status, Response
+from fastapi import Depends, HTTPException, status, Response, Request
 from sqlalchemy.orm import Session
 
 from api.utils.dependency import get_db
@@ -82,7 +82,29 @@ class AuthService:
         httponly=True,
         max_age=60 * 60 * 24 * REFRESH_TOKEN_EXPIRE_DAYS,
         samesite="lax",
-        secure=False 
+        secure=False #운영할 때는 True로 바꾸기
     )
+        
+    def handle_logout(self, db: db_dependency,request: Request, response: Response):
+        token = request.cookies.get("refresh_token")
+        if not token:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Refresh token이 없습니다."
+            )
+
+        db_token = db.query(RefreshToken).filter(RefreshToken.token == token).first()
+
+        if db_token:
+            db.delete(db_token)
+            db.commit()
+
+    
+        response.delete_cookie(
+            key="refresh_token",
+            httponly=True,
+            samesite="lax",
+            secure=False # 운영할 때는 True로 바꾸기
+        )
     
 auth_service = AuthService()
