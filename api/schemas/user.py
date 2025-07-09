@@ -5,7 +5,7 @@ from typing import Literal,Optional
 
 
 class UserBase(BaseModel):
-    username: str = Field(min_length=3, max_length=10,regex="^[가-힣a-zA-Z0-9]+$")
+    username: str = Field(min_length=3, max_length=10)
     email: EmailStr
 
 class UserCreate(UserBase):
