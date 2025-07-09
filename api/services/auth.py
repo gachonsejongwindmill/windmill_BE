@@ -107,8 +107,8 @@ class AuthService:
         value=token,
         httponly=True,
         max_age=60 * 60 * 24 * REFRESH_TOKEN_EXPIRE_DAYS,
-        samesite="lax",
-        secure=False #운영할 때는 True로 바꾸기
+        samesite="none",
+        secure=True #운영할 때는 True로 바꾸기
     )
         
     def handle_logout(self, db: db_dependency,request: Request, response: Response):
