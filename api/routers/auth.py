@@ -10,7 +10,7 @@ from api.utils.dependency import get_db
 
 auth = APIRouter(prefix="/auth", tags=['auth'])
 
-@auth.post("/register",status_code=status.HTTP_201_CREATED)
+@auth.post("/signup",status_code=status.HTTP_201_CREATED)
 async def user_register(user: UserCreate, db : Session = Depends(get_db)):
     data = user_service.create_user(user,db)
 
