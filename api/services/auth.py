@@ -129,8 +129,8 @@ class AuthService:
         response.delete_cookie(
             key="refresh_token",
             httponly=True,
-            samesite="lax",
-            secure=False # 운영할 때는 True로 바꾸기
+            samesite="none",
+            secure=True # 운영할 때는 True로 바꾸기
         )
     
 auth_service = AuthService()
