@@ -12,6 +12,7 @@ app = FastAPI()
 
 app.include_router(route)
 
+# 프론트와 연결을 위해
 origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
