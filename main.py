@@ -10,6 +10,7 @@ import uvicorn
 from api.utils.database import Base, engine
 from api.routers import route
 from api.models import *
+from api.responses.success_response import success_response
 
 Base.metadata.create_all(engine)
 
@@ -26,3 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+async def index():
+    return success_response(message = "welcome to courtvision")
