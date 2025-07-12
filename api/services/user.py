@@ -62,9 +62,12 @@ class UserService:
                 detail="해당 유저를 찾을 수 없습니다."
             ) 
         return UserOut.model_validate(user)
-    
+   
     def get_user_by_email(self, db: db_dependency, email: str) -> Optional[User]:
         return db.query(User).filter(User.email == email).first()
+    def get_all_users(self, db: db_dependency) -> Optional[User]:
+        users = db.query(User).all()
+        return [UserOut.model_validate(user) for user in users]
 user_service = UserService()
     
     
