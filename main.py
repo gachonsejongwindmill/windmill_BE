@@ -30,4 +30,4 @@ app.add_middleware(
 
 @app.get("/")
 async def index():
-    return success_response(message = "welcome to courtvision")
+    return success_response(message = "welcome")
