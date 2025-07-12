@@ -1,7 +1,7 @@
 from fastapi import Depends,status,HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-from typing import Annotated
+from typing import Annotated,List
 import pandas as pd
 
 from api.utils.dependency import get_db
@@ -29,5 +29,8 @@ class StockService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"DB 저장 중 오류 발생: {str(e)}"
             )
-        
+    
+    def get_all_stock(self, db : db_dependency) -> List[StockOut]:
+        stocks = db.query(Stock).order_by(Stock.ticker).all()
+        return [StockOut.model_validate(stock) for stock in stocks]
 stock_service = StockService()
