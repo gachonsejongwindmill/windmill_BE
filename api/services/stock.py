@@ -11,7 +11,7 @@ from api.schemas.stock import StockBase,StockOut
 db_dependency = Annotated[Session,Depends(get_db)]
 
 class StockService:
-    def save_smp(self,stock: Stock, db : db_dependency):
+    def save_smp(self, db : db_dependency):
         wiki_url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
         df = pd.read_html(wiki_url)[0]
 
@@ -29,3 +29,5 @@ class StockService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"DB 저장 중 오류 발생: {str(e)}"
             )
+        
+stock_service = StockService()
