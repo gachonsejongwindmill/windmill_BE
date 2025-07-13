@@ -1,5 +1,6 @@
 from fastapi import Depends,status,HTTPException
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from typing import Annotated,List
 import pandas as pd
@@ -38,8 +39,20 @@ class StockService:
                 detail=f"S&P 500 저장 실패: {str(e)}"
             )
     
-    def get_all_stock(self, db : db_dependency) -> List[StockOut]:
-        stocks = db.query(Stock).order_by(Stock.ticker).all()
+    def get_stock(self, db : db_dependency, search : str = "") -> List[StockOut]:
+        query = db.query(Stock).order_by(Stock.ticker)
+
+        if search:
+            search_pattern = f"%{search}%"
+            query = query.filter(
+                or_(
+                    Stock.name.ilike(f"%{search}%"),
+                    Stock.ticker.ilike(f"%{search}%")
+                )
+            )
+
+        stocks = query.all()
+
         return [StockOut.model_validate(stock) for stock in stocks]
     
     def get_stock_range(self, db : db_dependency, start : int, end : int):

@@ -16,9 +16,18 @@ db_dependency = Annotated[Session,Depends(get_db)]
 
 @stock.get("/",status_code=status.HTTP_200_OK)
 async def get_all_stock(db:db_dependency):
-    data = stock_service.get_all_stock(db)
+    data = stock_service.get_stock(db)
     return success_response(
-        message="모든 종목을 출력합니다",
+        message="종목을 출력합니다",
+        data=data
+    )
+
+@stock.get("/search",status_code=status.HTTP_200_OK)
+async def get_search_stock(db: db_dependency, search: str = ""):
+    data = stock_service.get_stock(db,search)
+
+    return success_response(
+        message=f"{search}에 대한 종목을 출력합니다",
         data=data
     )
 
