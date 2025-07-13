@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Depends,status
+from fastapi import APIRouter,Depends,status, Query
 from sqlalchemy.orm import Session
 
 from typing import Annotated
@@ -20,6 +20,18 @@ async def get_all_stock(db:db_dependency):
     return success_response(
         message="모든 종목을 출력합니다",
         data=data
+    )
+
+@stock.get("/range",status_code=status.HTTP_200_OK)
+async def get_ranged_stock(
+    db : db_dependency,
+    start: int = Query(1,ge=1), 
+    end: int = Query(50,ge=1)
+):
+    data = stock_service.get_stock_range(db,start,end)
+    return success_response(
+        message=f"{start}부터 {end}까지의 종목을 반환합니다",
+        data = data
     )
 
 

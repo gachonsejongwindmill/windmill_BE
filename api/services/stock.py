@@ -41,4 +41,17 @@ class StockService:
     def get_all_stock(self, db : db_dependency) -> List[StockOut]:
         stocks = db.query(Stock).order_by(Stock.ticker).all()
         return [StockOut.model_validate(stock) for stock in stocks]
+    
+    def get_stock_range(self, db : db_dependency, start : int, end : int):
+        if start > end:
+            raise HTTPException(status_code=400, detail="start 값은 end보다 작아야 합니다.")
+        stocks = (
+            db.query(Stock)
+            .order_by(Stock.name)
+            .offset(start - 1)
+            .limit(end - start + 1)
+            .all()
+        )
+        
+        return [StockOut.model_validate(stock) for stock in stocks]
 stock_service = StockService()
