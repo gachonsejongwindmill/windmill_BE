@@ -46,8 +46,8 @@ class StockService:
             search_pattern = f"%{search}%"
             query = query.filter(
                 or_(
-                    Stock.name.ilike(f"%{search}%"),
-                    Stock.ticker.ilike(f"%{search}%")
+                    Stock.name.ilike(search_pattern),
+                    Stock.ticker.ilike(search_pattern)
                 )
             )
 
