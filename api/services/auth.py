@@ -12,6 +12,7 @@ from api.utils.dependency import get_db
 from api.schemas.user import UserLogin, UserOut
 from api.services.user import user_service
 from api.models.refresh_token import RefreshToken
+from api.models.user import User
 
 load_dotenv()
 
@@ -132,5 +133,29 @@ class AuthService:
             samesite="none",
             secure=True # 운영할 때는 True로 바꾸기
         )
+
+    def get_current_user(self,request: Request, db: db_dependency) -> User:
+        token = request.cookies.get("access_token")
+        if not token:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Access token이 없습니다.",
+            )
+        
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            user_id: int = payload.get("sub")
+            if user_id is None:
+                raise HTTPException(status_code=401, detail="토큰 정보가 유효하지 않습니다.")
+        except JWTError:
+            raise HTTPException(status_code=401, detail="토큰이 유효하지 않습니다.")
+        
+        user = db.query(User).filter(User.id == user_id).first()
+        if user is None:
+            raise HTTPException(status_code=404, detail="유저를 찾을 수 없습니다.")
+        
+        return user
+
     
+
 auth_service = AuthService()
