@@ -12,5 +12,7 @@ class User(AbstractBaseModel):
     password : Mapped[str] = mapped_column(nullable=False)
     
     refresh_token = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")
+    interests = relationship("Interest", back_populates="user", cascade="all, delete-orphan")
+
     def __str__(self) -> str:
         return self.username
