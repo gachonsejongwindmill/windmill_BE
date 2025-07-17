@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from api.responses.success_response import success_response
 from api.services.user import user_service
-from api.services.auth import auth_service
+from api.services.author import auth_service
 from api.schemas.user import UserCreate,UserLogin
 from api.utils.dependency import get_db
 

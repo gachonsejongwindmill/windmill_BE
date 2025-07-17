@@ -8,7 +8,7 @@ class Interest(AbstractBaseModel):
 
     user_id : Mapped[str] = mapped_column(ForeignKey("user.id"))
     stock_id : Mapped[str] = mapped_column(ForeignKey("stock.id")) 
-    interested : Mapped[bool] = mapped_column(Boolean, default=False)
+    interested : Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     user = relationship("User", back_populates="interests")
     stock = relationship("Stock", back_populates="interests")
