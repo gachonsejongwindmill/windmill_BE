@@ -12,6 +12,7 @@ from typing import Annotated, Optional
 
 from api.utils.dependency import get_db
 from api.schemas.user import UserCreate, UserOut
+from api.schemas.interest import InterestOut
 from api.models.user import User
 from api.models.stock import Stock
 from api.models.interest import Interest
@@ -104,7 +105,7 @@ class UserService:
         try:
             db.add(interest)
             db.commit()
-            return interest
+            return InterestOut.model_validate(interest)
         except Exception as e:
             db.rollback()
             raise HTTPException(

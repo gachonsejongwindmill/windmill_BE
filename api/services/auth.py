@@ -6,17 +6,18 @@ from jose import jwt, JWTError
 from typing import Annotated
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status, Response, Request
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from api.utils.dependency import get_db
 from api.schemas.user import UserLogin, UserOut
-from api.services.user import user_service
 from api.models.refresh_token import RefreshToken
 from api.models.user import User
 
 load_dotenv()
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated = 'auto')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = os.environ.get("ALGORITHM")
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.environ.get("REFRESH_TOKEN_EXPIRE_DAYS",7))
@@ -25,7 +26,7 @@ db_dependency = Annotated[Session,Depends(get_db)]
 
 class AuthService:
     def handle_login(self, db : db_dependency, user_login : UserLogin, response : Response):
-        user = user_service.get_user_by_email(db, user_login.email)
+        user = db.query(User).filter(User.email==user_login.email).first()
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -134,26 +135,31 @@ class AuthService:
             secure=True # 운영할 때는 True로 바꾸기
         )
 
-    def get_current_user(self,request: Request, db: db_dependency) -> User:
-        token = request.cookies.get("access_token")
-        if not token:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Access token이 없습니다.",
-            )
-        
+    def get_current_user(
+    token: str = Depends(oauth2_scheme), 
+    db: Session = Depends(get_db)
+    ) -> User:
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            user_id: int = payload.get("sub")
+            user_id: str = payload.get("sub")
             if user_id is None:
-                raise HTTPException(status_code=401, detail="토큰 정보가 유효하지 않습니다.")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="토큰에 유저 정보가 없습니다."
+                )
         except JWTError:
-            raise HTTPException(status_code=401, detail="토큰이 유효하지 않습니다.")
-        
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="유효하지 않은 토큰입니다."
+            )
+
         user = db.query(User).filter(User.id == user_id).first()
         if user is None:
-            raise HTTPException(status_code=404, detail="유저를 찾을 수 없습니다.")
-        
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="유저를 찾을 수 없습니다."
+            )
+
         return user
 
     
