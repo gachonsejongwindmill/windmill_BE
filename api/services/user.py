@@ -12,11 +12,14 @@ from typing import Annotated, Optional
 from api.utils.dependency import get_db
 from api.schemas.user import UserCreate, UserOut
 from api.models.user import User
+from api.models.stock import Stock
+from api.models.interest import Interest
+from api.services.auth import auth_service
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated = 'auto')
 
 db_dependency = Annotated[Session,Depends(get_db)]
-
+user_dependency = Annotated[User,Depends(auth_service.get_current_user)]
 class UserService:
     def create_user(self,user_create: UserCreate, db : db_dependency):
         
@@ -68,6 +71,33 @@ class UserService:
     def get_all_users(self, db: db_dependency) -> Optional[User]:
         users = db.query(User).all()
         return [UserOut.model_validate(user) for user in users]
-user_service = UserService()
     
+    def user_interest(self, user: user_dependency, db: db_dependency, stock_id : str):
+        stock = db.query(Stock).filter(Stock.id == stock_id).first()
+
+        if not stock:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="해당 종목이 존재하지 않습니다."
+            )
+
+        interest = Interest(
+            user_id=user.id,
+            stock_id=stock_id,
+            interested=True
+        )
+        try:
+            db.add(interest)
+            db.commit()
+            return interest
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="즐겨찾기 추가 중 오류가 발생하였습니다"
+            )
+        
+        
+
+user_service = UserService()
     
