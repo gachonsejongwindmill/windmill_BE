@@ -7,7 +7,7 @@ from api.utils.dependency import get_db
 from api.models.user import User
 from api.responses.success_response import success_response
 from api.services.user import user_service
-from api.services.auth import auth_service
+from api.services.author import auth_service
 
 user = APIRouter(prefix="/user", tags= ['user'])
 

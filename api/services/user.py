@@ -16,7 +16,7 @@ from api.schemas.interest import InterestOut
 from api.models.user import User
 from api.models.stock import Stock
 from api.models.interest import Interest
-from api.services.auth import auth_service
+from api.services.author import auth_service
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated = 'auto')
 
@@ -105,7 +105,6 @@ class UserService:
         try:
             db.add(interest)
             db.commit()
-            return InterestOut.model_validate(interest)
         except Exception as e:
             db.rollback()
             raise HTTPException(
@@ -113,6 +112,7 @@ class UserService:
                 detail="즐겨찾기 추가 중 오류가 발생하였습니다"
             )
         
+        return InterestOut.model_validate(interest)
         
 
 user_service = UserService()

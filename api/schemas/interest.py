@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class InterestOut(BaseModel):
     id: str
@@ -6,5 +6,4 @@ class InterestOut(BaseModel):
     stock_id: str
     interested: bool
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
