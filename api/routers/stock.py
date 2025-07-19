@@ -42,6 +42,14 @@ async def get_ranged_stock(
         message=f"{start}부터 {end}까지의 종목을 반환합니다",
         data = data
     )
+
+@stock.get("/{stock_id}",status_code=status.HTTP_200_OK)
+async def get_stock_id(db:db_dependency, stock_id: str):
+    data = stock_service.get_stock_id(db,stock_id)
+    return success_response(
+        message=f"{stock_id}의 종목을 반환합니다",
+        data=data
+    )
 @stock.get("/interest/{stock_id}", status_code=status.HTTP_200_OK)
 async def get_interest(db: db_dependency, stock_id: str):
     data = stock_service.get_all_stock_interest(db,stock_id)

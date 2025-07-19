@@ -41,6 +41,16 @@ class StockService:
                 detail=f"S&P 500 저장 실패: {str(e)}"
             )
     
+    def get_stock_id(self, db: db_dependency, stock_id: str) -> Stock:
+        stock = db.query(Stock).filter(Stock.id == stock_id).first()
+        if stock:
+            return StockOut.model_validate(stock)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=("등록된 id가 없습니다")
+            )
+    
     def get_stock(self, db : db_dependency, search : str = "") -> List[StockOut]:
         query = db.query(Stock).order_by(Stock.ticker)
 
