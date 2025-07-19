@@ -10,6 +10,7 @@ from api.utils.dependency import get_db
 from api.models.stock import Stock
 from api.models.interest import Interest
 from api.schemas.stock import StockBase,StockOut
+from api.schemas.interest import InterestOut
 
 db_dependency = Annotated[Session,Depends(get_db)]
 
@@ -72,6 +73,6 @@ class StockService:
     def get_all_stock_interest(self, db: db_dependency, stock_id: str) -> Optional[Stock]:
         stocks = db.query(Interest).filter(Interest.stock_id == stock_id).all()
 
-        return [StockOut.model_validate(stock) for stock in stocks]
+        return [InterestOut.model_validate(stock) for stock in stocks]
 
 stock_service = StockService()
