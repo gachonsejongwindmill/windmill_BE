@@ -22,6 +22,15 @@ async def get_app_user(db: db_dependency):
         data=data
     )
 
+
+@user.get("/interest",status_code=status.HTTP_200_OK)
+async def get_interest(user: user_dependency, db: db_dependency):
+    data = user_service.get_all_user_interest(user,db)
+    return success_response(
+        message="즐겨찾기 목록을 반환합니다",
+        data=data
+    )
+
 @user.post("/interest/{stock_id}",status_code=status.HTTP_201_CREATED)
 async def add_interest(stock_id: str, user: user_dependency, db: db_dependency):
     interest = user_service.user_interest(user,db,stock_id)
