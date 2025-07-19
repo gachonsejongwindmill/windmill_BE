@@ -42,7 +42,14 @@ async def get_ranged_stock(
         message=f"{start}부터 {end}까지의 종목을 반환합니다",
         data = data
     )
-
+@stock.get("/interest/{stock_id}", status_code=status.HTTP_200_OK)
+async def get_interest(db: db_dependency, stock_id: str):
+    data = stock_service.get_all_stock_interest(db,stock_id)
+    return success_response(
+        message="해당 종목의 즐겨찾기 목록을 반환합니다",
+        data=data
+    )
+    
 
 @stock.post("/saveSMP",status_code=status.HTTP_200_OK)
 async def save_smp(db:db_dependency):

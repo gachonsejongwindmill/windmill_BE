@@ -2,12 +2,13 @@ from fastapi import Depends,status,HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
-from typing import Annotated,List
+from typing import Annotated,List, Optional
 import pandas as pd
 import requests
 
 from api.utils.dependency import get_db
 from api.models.stock import Stock
+from api.models.interest import Interest
 from api.schemas.stock import StockBase,StockOut
 
 db_dependency = Annotated[Session,Depends(get_db)]
@@ -65,6 +66,12 @@ class StockService:
             .limit(end - start + 1)
             .all()
         )
-        
+       
         return [StockOut.model_validate(stock) for stock in stocks]
+    
+    def get_all_stock_interest(self, db: db_dependency, stock_id: str) -> Optional[Stock]:
+        stocks = db.query(Interest).filter(Interest.stock_id == stock_id).all()
+
+        return [StockOut.model_validate(stock) for stock in stocks]
+
 stock_service = StockService()
