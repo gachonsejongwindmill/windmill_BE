@@ -7,4 +7,6 @@ class Stock(AbstractBaseModel):
     __tablename__ = "stock"
     name: Mapped[str] = mapped_column(nullable=False)
     ticker: Mapped[str] = mapped_column(unique=True, index=True, nullable=False)
+
     interests = relationship("Interest", back_populates="stock", cascade="all, delete-orphan")
+    mystocks = relationship("MyStock", back_populates="stock", cascade="all, delete-orphan")
