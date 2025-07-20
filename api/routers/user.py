@@ -39,3 +39,11 @@ async def add_interest(stock_id: str, user: user_dependency, db: db_dependency):
         message="즐겨찾기에 추가합니다",
         data=interest
     )
+
+@user.delete("/interest/{stock_id}", status_code=status.HTTP_200_OK)
+async def delete_interest(stock_id: str, user: user_dependency, db: db_dependency):
+    user_service.delete_interest(user,db,stock_id)
+    return success_response(
+        status_code=status.HTTP_200_OK,
+        message="즐겨찾기 목록에 삭제 되었습니다"
+    )

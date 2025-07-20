@@ -84,5 +84,6 @@ class StockService:
         stocks = db.query(Interest).filter(Interest.stock_id == stock_id).all()
 
         return [InterestOut.model_validate(stock) for stock in stocks]
-
+    
+    
 stock_service = StockService()

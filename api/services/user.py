@@ -118,5 +118,15 @@ class UserService:
     def get_all_user_interest(self, user: user_dependency, db: db_dependency) -> Optional[Interest]:
         interests = db.query(Interest).filter(Interest.user_id==user.id).all()
         return [InterestOut.model_validate(interest) for interest in interests]
+    
+    def delete_interest(self, user: user_dependency, db: db_dependency, stock_id:str):
+        interest = db.query(Interest).filter(Interest.user_id==user.id and Interest.stock_id==stock_id).first()
+        if not interest:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="등록된 interest가 없습니다"
+            )
+        db.delete(interest)
+        db.commit()
 user_service = UserService()
     
