@@ -26,4 +26,9 @@ class MyStockOut(MyStockBase):
 
     model_config = ConfigDict(from_attributes=True)
 
+class MyStockListOut(MyStockBase):
+    
+
+    model_config = ConfigDict(from_attributes=True)
+
 

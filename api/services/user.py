@@ -5,15 +5,15 @@ load_dotenv()
 
 from fastapi import Depends, status, HTTPException
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import and_, desc
-from sqlalchemy.orm import Session
+from sqlalchemy import and_, desc, func, select
+from sqlalchemy.orm import Session, aliased
 from passlib.context import CryptContext
 from typing import Annotated, Optional
 import datetime
 
 from api.utils.dependency import get_db
 from api.schemas.user import UserCreate, UserOut
-from api.schemas.mystock import MyStockAdd,MyStockOut
+from api.schemas.mystock import MyStockAdd,MyStockOut,MyStockListOut
 from api.schemas.interest import InterestOut
 from api.models.user import User
 from api.models.stock import Stock
@@ -144,7 +144,7 @@ class UserService:
         mystock = (
             db.query(MyStock)
             .filter(MyStock.user_id==user.id, MyStock.stock_id == stock.id)
-            .order_by(desc(MyStock.date), desc(MyStock.created_at))
+            .order_by(desc(MyStock.created_at))
             .first()
         )
         if mystock:
@@ -183,7 +183,34 @@ class UserService:
             )
         
         return MyStockOut.model_validate(mystockadd)
-        
+    
+    def get_mystock_list(self, user: user_dependency, db: db_dependency, stock_id: str):
+        mystocks = db.query(MyStock).filter(MyStock.user_id==user.id, MyStock.stock_id == stock_id).order_by(desc(MyStock.date)).all()
+        return [MyStockOut.model_validate(mystock) for mystock in mystocks]
+    
+    def get_mystock(self, user: user_dependency, db: db_dependency):
+        subquery = (
+            db.query(
+                MyStock.stock_id,
+                func.max(MyStock.created_at).label("latest_date")
+            )
+            .filter(MyStock.user_id == user.id)
+            .group_by(MyStock.stock_id)
+            .subquery()
+        )
+
+        latest_stocks = (
+            db.query(MyStock)
+            .join(
+                subquery,
+                (MyStock.stock_id == subquery.c.stock_id) & (MyStock.created_at == subquery.c.latest_date)
+            )
+            .filter(MyStock.user_id == user.id)
+            .all()
+        )
+
+        return [MyStockListOut.model_validate(ms) for ms in latest_stocks]
+
 
         
 

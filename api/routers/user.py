@@ -32,6 +32,22 @@ async def get_interest(user: user_dependency, db: db_dependency):
         data=data
     )
 
+@user.get("/mystock",status_code=status.HTTP_200_OK)
+async def get_mystock(user: user_dependency, db: db_dependency):
+    data = user_service.get_mystock(user,db)
+    return success_response(
+        message="내 주식 목록을 반환합니다",
+        data = data
+    )
+
+@user.get("/mystock/{stock_id}", status_code=status.HTTP_200_OK)
+async def get_mystock_list(user: user_dependency, db: db_dependency, stock_id : str):
+    data = user_service.get_mystock_list(user, db, stock_id)
+    return success_response(
+        message=f"{stock_id}의 로그를 출력합니다",
+        data=data
+    )
+
 @user.post("/interest/{stock_id}",status_code=status.HTTP_201_CREATED)
 async def add_interest(stock_id: str, user: user_dependency, db: db_dependency):
     interest = user_service.user_interest(user,db,stock_id)
