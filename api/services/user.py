@@ -5,17 +5,20 @@ load_dotenv()
 
 from fastapi import Depends, status, HTTPException
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import and_
+from sqlalchemy import and_, desc
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from typing import Annotated, Optional
+import datetime
 
 from api.utils.dependency import get_db
 from api.schemas.user import UserCreate, UserOut
+from api.schemas.mystock import MyStockAdd,MyStockOut
 from api.schemas.interest import InterestOut
 from api.models.user import User
 from api.models.stock import Stock
 from api.models.interest import Interest
+from api.models.mystock import MyStock
 from api.services.author import auth_service
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated = 'auto')
@@ -114,13 +117,13 @@ class UserService:
             )
         
         return InterestOut.model_validate(interest)
-    
+   
     def get_all_user_interest(self, user: user_dependency, db: db_dependency) -> Optional[Interest]:
         interests = db.query(Interest).filter(Interest.user_id==user.id).all()
         return [InterestOut.model_validate(interest) for interest in interests]
     
     def delete_interest(self, user: user_dependency, db: db_dependency, stock_id:str):
-        interest = db.query(Interest).filter(Interest.user_id==user.id and Interest.stock_id==stock_id).first()
+        interest = db.query(Interest).filter(Interest.user_id==user.id, Interest.stock_id==stock_id).first()
         if not interest:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -128,5 +131,61 @@ class UserService:
             )
         db.delete(interest)
         db.commit()
+
+    def add_mystock(self, user: user_dependency, db: db_dependency, stock_id: str, input: MyStockAdd):
+        stock = db.query(Stock).filter(Stock.id==stock_id).first()
+        cost = 0
+        count = 0
+        if not stock:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="해당 종목이 존재하지 않습니다."
+            )
+        mystock = (
+            db.query(MyStock)
+            .filter(MyStock.user_id==user.id, MyStock.stock_id == stock.id)
+            .order_by(desc(MyStock.date), desc(MyStock.created_at))
+            .first()
+        )
+        if mystock:
+            cost = mystock.average_cost
+            count = mystock.all_stock_count
+        if input.buy_stock_count > 0:
+            result =int(((cost*count)+(input.buy_cost*input.buy_stock_count))/(count+input.buy_stock_count))
+        else:
+            if count+input.buy_stock_count<0:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="보유하신 수량보다 많이 팔 수 없습니다"
+                )
+            elif count+input.buy_stock_count == 0:
+                result = 0
+            else: result = cost
+            
+        mystockadd = MyStock(
+            user_id = user.id,
+            stock_id = stock.id,
+            average_cost = result,
+            all_stock_count = input.buy_stock_count + count,
+            buy_cost = input.buy_cost,
+            buy_stock_count = input.buy_stock_count,
+            date = input.date
+        )
+        try:
+            db.add(mystockadd)
+            db.commit()
+            db.refresh(mystockadd)
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="보유주식 추가 중 오류가 발생하였습니다"
+            )
+        
+        return MyStockOut.model_validate(mystockadd)
+        
+
+        
+
 user_service = UserService()
     
