@@ -7,8 +7,8 @@ class MyStock(AbstractBaseModel):
 
     user_id : Mapped[str] = mapped_column(ForeignKey("user.id"))
     stock_id : Mapped[str] = mapped_column(ForeignKey("stock.id"))
-    average_cost : Mapped[float] = mapped_column(nullable=False)
-    all_stock_count : Mapped[float] = mapped_column(nullable=False)
+    average_cost : Mapped[float] = mapped_column(default=0, nullable=False)
+    all_stock_count : Mapped[float] = mapped_column(default=0.0, nullable=False)
     buy_cost : Mapped[float] = mapped_column(nullable=False)
     buy_stock_count : Mapped[float] = mapped_column(nullable=False)
     date : Mapped[datetime.date] = mapped_column(nullable=False)

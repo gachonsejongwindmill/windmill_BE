@@ -8,6 +8,7 @@ from api.models.user import User
 from api.responses.success_response import success_response
 from api.services.user import user_service
 from api.services.author import auth_service
+from api.schemas.mystock import MyStockAdd
 
 user = APIRouter(prefix="/user", tags= ['user'])
 
@@ -39,6 +40,16 @@ async def add_interest(stock_id: str, user: user_dependency, db: db_dependency):
         message="즐겨찾기에 추가합니다",
         data=interest
     )
+
+@user.post("/mystock/{stock_id}",status_code=status.HTTP_201_CREATED)
+async def add_mystock(stock_id: str, user: user_dependency, db: db_dependency, input : MyStockAdd):
+    mystock = user_service.add_mystock(user, db, stock_id, input)
+    return success_response(
+        status_code=status.HTTP_201_CREATED,
+        message="my stock에 추가합니다",
+        data = mystock
+    )
+
 
 @user.delete("/interest/{stock_id}", status_code=status.HTTP_200_OK)
 async def delete_interest(stock_id: str, user: user_dependency, db: db_dependency):
