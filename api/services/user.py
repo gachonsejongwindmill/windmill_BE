@@ -184,15 +184,15 @@ class UserService:
         
         return MyStockOut.model_validate(mystockadd)
     
-    def get_mystock(self, user: user_dependency, db: db_dependency, stock_id: str):
+    def get_mystock_list(self, user: user_dependency, db: db_dependency, stock_id: str):
         mystocks = db.query(MyStock).filter(MyStock.user_id==user.id, MyStock.stock_id == stock_id).order_by(desc(MyStock.date)).all()
         return [MyStockOut.model_validate(mystock) for mystock in mystocks]
     
-    def get_mystock_list(self, user: user_dependency, db: db_dependency):
+    def get_mystock(self, user: user_dependency, db: db_dependency):
         subquery = (
             db.query(
                 MyStock.stock_id,
-                func.max(MyStock.date).label("latest_date")
+                func.max(MyStock.created_at).label("latest_date")
             )
             .filter(MyStock.user_id == user.id)
             .group_by(MyStock.stock_id)
@@ -203,7 +203,7 @@ class UserService:
             db.query(MyStock)
             .join(
                 subquery,
-                (MyStock.stock_id == subquery.c.stock_id) & (MyStock.date == subquery.c.latest_date)
+                (MyStock.stock_id == subquery.c.stock_id) & (MyStock.created_at == subquery.c.latest_date)
             )
             .filter(MyStock.user_id == user.id)
             .all()
