@@ -19,7 +19,7 @@ AI_SERVER = os.environ.get("AI_SERVER")
 
 class PredictService:
     def predict_stock(self, db: db_dependency, feature: Featurein, stock_id: str):
-        data = self.get_feature(db,feature)
+        data = self.get_feature(db,feature,stock_id)
         stock = stock_service.get_stock_id(db,stock_id)
         ai_data = self.predict_response(data)
         days = feature.predict_range*4
