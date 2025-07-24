@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from typing import Annotated,List, Optional
 import pandas as pd
 import requests
+import yfinance as ys
+from datetime import datetime
 
 from api.utils.dependency import get_db
 from api.models.stock import Stock
@@ -84,4 +86,20 @@ class StockService:
         stocks = db.query(Interest).filter(Interest.stock_id == stock_id).all()
 
         return [InterestOut.model_validate(stock) for stock in stocks]
+    
+    def get_price(self, ticker: str, days: int):
+        stock = ys.Ticker(ticker)
+        period = f"{days}d"
+        hist = stock.history(period=period)
+
+        historical = [
+            {
+                "date": date.strftime("%Y-%m-%d"),
+                "data": round(price, 2),
+                "type": "historical"
+            }
+            for date, price in zip(hist.index, hist["Close"])
+        ]
+
+        return historical
 stock_service = StockService()

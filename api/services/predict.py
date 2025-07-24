@@ -5,6 +5,8 @@ import requests
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Annotated
+from datetime import datetime
+import yfinance as ys
 
 from api.utils.dependency import get_db
 from api.schemas.feature import Featurein,FeatureOut
@@ -16,14 +18,19 @@ db_dependency = Annotated[Session, Depends(get_db)]
 AI_SERVER = os.environ.get("AI_SERVER")
 
 class PredictService:
-    def predict_stock(self, db: db_dependency, feature: Featurein):
+    def predict_stock(self, db: db_dependency, feature: Featurein, stock_id: str):
         data = self.get_feature(db,feature)
+        stock = stock_service.get_stock_id(db,stock_id)
         ai_data = self.predict_response(data)
-        
-        return ai_data
+        days = feature.predict_range*4
+        his_data = stock_service.get_price(stock.ticker, days)
+        total_data = ai_data + his_data
+        sorted_data = sorted(total_data,key=lambda x: x["date"])
 
-    def get_feature(self, db: db_dependency, feature: Featurein):
-        stock = stock_service.get_stock_id(db,feature.stock_id)
+        return sorted_data
+
+    def get_feature(self, db: db_dependency, feature: Featurein, stock_id: str):
+        stock = stock_service.get_stock_id(db,stock_id)
         ticker = stock.ticker
         value1 = self.convert_feature_to_int_value1(feature)
         value2 = feature.predict_range
@@ -64,8 +71,9 @@ class PredictService:
 
         transformed = [
             {
-                "date": item["ds"].split(" ")[0],  # 날짜만 추출
-                "data": item["TimeLLM"]
+                "date": item["ds"].split(" ")[0],  
+                "data": item["TimeLLM"],
+                "type": "predict"
             }
             for item in ai_data.get("forecast", [])
         ]
