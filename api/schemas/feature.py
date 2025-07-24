@@ -1,7 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
 class FeatureBase(BaseModel):
-    ticker: str
     start: bool
     high: bool
     low: bool
@@ -10,6 +9,7 @@ class FeatureBase(BaseModel):
     predict_range : int
 
 class Featurein(FeatureBase):
+    stock_id: str
     model_config = ConfigDict(from_attributes=True)
 
 class FeatureOut(BaseModel):
