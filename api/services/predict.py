@@ -22,7 +22,7 @@ class PredictService:
         data = self.get_feature(db,feature,stock_id)
         stock = stock_service.get_stock_id(db,stock_id)
         ai_data = self.predict_response(data)
-        days = feature.predict_range*4
+        days = feature.period*4
         his_data = stock_service.get_price(stock.ticker, days)
         total_data = ai_data + his_data
         sorted_data = sorted(total_data,key=lambda x: x["date"])
@@ -33,7 +33,7 @@ class PredictService:
         stock = stock_service.get_stock_id(db,stock_id)
         ticker = stock.ticker
         value1 = self.convert_feature_to_int_value1(feature)
-        value2 = feature.predict_range
+        value2 = feature.period
         return FeatureOut(
             string_value=ticker,
             int_value1=value1,

@@ -6,7 +6,7 @@ class FeatureBase(BaseModel):
     low: bool
     volume: bool
     fixed_rate: bool
-    predict_range : int
+    period : int
 
 class Featurein(FeatureBase):
     stock_id: str
