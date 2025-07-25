@@ -14,5 +14,5 @@ class Featurein(FeatureBase):
 
 class FeatureOut(BaseModel):
     string_value: str
-    int_value1: int
+    int_value1: str
     int_value2: int
