@@ -49,7 +49,7 @@ class PredictService:
             int(feature.fixed_rate)
         ]
         binary_string = ''.join(str(bit) for bit in bits)
-        return int(binary_string)
+        return binary_string
     
     def predict_response(self, feature: FeatureOut):
         try:
