@@ -48,20 +48,18 @@ async def get_mystock_list(user: user_dependency, db: db_dependency, stock_id : 
         data=data
     )
 
-@user.post("/interest/{stock_id}",status_code=status.HTTP_201_CREATED)
+@user.post("/interest/{stock_id}",status_code=status.HTTP_200_OK)
 async def add_interest(stock_id: str, user: user_dependency, db: db_dependency):
     interest = user_service.user_interest(user,db,stock_id)
     return success_response(
-        status_code=status.HTTP_201_CREATED,
         message="즐겨찾기에 추가합니다",
         data=interest
     )
 
-@user.post("/mystock/{stock_id}",status_code=status.HTTP_201_CREATED)
+@user.post("/mystock/{stock_id}",status_code=status.HTTP_200_OK)
 async def add_mystock(stock_id: str, user: user_dependency, db: db_dependency, input : MyStockAdd):
     mystock = user_service.add_mystock(user, db, stock_id, input)
     return success_response(
-        status_code=status.HTTP_201_CREATED,
         message="my stock에 추가합니다",
         data = mystock
     )
