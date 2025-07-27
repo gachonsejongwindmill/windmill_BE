@@ -6,6 +6,14 @@ class FeatureBase(BaseModel):
     low: bool
     volume: bool
     fixed_rate: bool
+    per: bool
+    pbr: bool
+    psr: bool
+    ev: bool
+    roe: bool
+    roa: bool
+    opm: bool
+    npm: bool
     period : int
 
 class Featurein(FeatureBase):

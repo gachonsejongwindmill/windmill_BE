@@ -46,7 +46,15 @@ class PredictService:
             int(feature.start),
             int(feature.high),
             int(feature.low),
-            int(feature.fixed_rate)
+            int(feature.fixed_rate),
+            int(feature.per),
+            int(feature.pbr),
+            int(feature.psr),
+            int(feature.ev),
+            int(feature.roe),
+            int(feature.roa),
+            int(feature.opm),
+            int(feature.npm)
         ]
         binary_string = ''.join(str(bit) for bit in bits)
         return binary_string
