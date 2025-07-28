@@ -205,7 +205,10 @@ class UserService:
                 subquery,
                 (MyStock.stock_id == subquery.c.stock_id) & (MyStock.created_at == subquery.c.latest_date)
             )
-            .filter(MyStock.user_id == user.id)
+            .filter(
+                MyStock.user_id == user.id,
+                MyStock.all_stock_count > 0
+            )
             .all()
         )
 
