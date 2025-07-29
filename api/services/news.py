@@ -13,7 +13,6 @@ load_dotenv()
 NAVER_CLIENT_ID=os.environ.get("NAVER_CLIENT_ID")
 NAVER_CLIENT_SECRET=os.environ.get("NAVER_CLIENT_SECRET")
 NAVER_NEWS_URL= "https://openapi.naver.com/v1/search/news.json"
-db_dependency = Annotated(Session,Depends(get_db))
 
 class NewsService:
     def get_headers(self):
@@ -32,7 +31,7 @@ class NewsService:
 
         response = requests.get(NAVER_NEWS_URL, headers=headers, params=params)
         response.raise_for_status()
-        
+
         data = response.json()
 
         return [
