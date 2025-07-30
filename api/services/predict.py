@@ -22,6 +22,11 @@ class PredictService:
         data = self.get_feature(db,feature,stock_id)
         stock = stock_service.get_stock_id(db,stock_id)
         ai_data = self.predict_response(data)
+        if not ai_data:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+                detail="예측값을 받아오지 못했습니다"
+            )
         days = feature.period*4
         his_data = stock_service.get_price(stock.ticker, days)
         total_data = ai_data + his_data
