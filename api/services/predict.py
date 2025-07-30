@@ -24,7 +24,7 @@ class PredictService:
         ai_data = self.predict_response(data)
         if not ai_data:
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="예측값을 받아오지 못했습니다"
             )
         days = feature.period*4
