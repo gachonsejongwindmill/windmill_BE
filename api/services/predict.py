@@ -50,7 +50,7 @@ class PredictService:
             int(feature.per),
             int(feature.pbr),
             int(feature.psr),
-            int(feature.ev),
+            int(feature.snp),
             int(feature.roe),
             int(feature.roa),
             int(feature.opm),

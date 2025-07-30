@@ -9,7 +9,7 @@ class FeatureBase(BaseModel):
     per: bool
     pbr: bool
     psr: bool
-    ev: bool
+    snp: bool
     roe: bool
     roa: bool
     opm: bool
