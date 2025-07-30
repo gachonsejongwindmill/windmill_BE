@@ -39,8 +39,7 @@ class PredictService:
             int_value1=value1,
             int_value2=value2
         )
-       
-    def convert_feature_to_int_value1(self, feature: Featurein) -> int:
+    def convert_feature_to_int_value1(self, feature: Featurein) -> str:
         bits = [
             int(feature.volume),
             int(feature.start),
