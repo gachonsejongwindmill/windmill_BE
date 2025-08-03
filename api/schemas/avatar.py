@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
 class AvatarIn(BaseModel):
+    name : str
     loss : int
     age : int
 
