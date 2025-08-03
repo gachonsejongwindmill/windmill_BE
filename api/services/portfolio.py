@@ -31,5 +31,8 @@ class PortfolioService:
         
         return AvartarOut.model_validate(user_avartar)
     
+    def get_avartar(self, user: user_dependency, db: db_dependency):
+        datas = db.query(Avartar).filter(Avartar.user_id == user.id).all()
+        return [AvartarOut.model_validate(data) for data in datas]
 
 portfolio_service = PortfolioService()
