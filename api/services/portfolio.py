@@ -14,6 +14,7 @@ user_dependency = Annotated[User,Depends(auth_service.get_current_user)]
 class PortfolioService:
     def add_avatar(self, user: user_dependency, db: db_dependency, avatar: AvatarIn):
         user_avatar = Avatar(
+            name = avatar.name,
             user_id = user.id,
             age = avatar.age,
             loss = avatar.loss
