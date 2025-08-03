@@ -13,4 +13,20 @@ user_dependency = Annotated[User,Depends(auth_service.get_current_user)]
 
 class PortfolioService:
     def add_avartar(self, user: user_dependency, db: db_dependency, avartar: AvartarIn):
-        user_avartar = Avartar
+        user_avartar = Avartar(
+            user_id = user.id,
+            age = avartar.age,
+            loss = avartar.loss
+        )
+
+        try:
+            db.add(user_avartar)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="아바타 생성 중 오류가 발생하였습니다"
+            )
+        
+        return AvartarOut.model_validate(user_avartar)
