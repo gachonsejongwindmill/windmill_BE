@@ -14,6 +14,6 @@ class User(AbstractBaseModel):
     refresh_token = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")
     interests = relationship("Interest", back_populates="user", cascade="all, delete-orphan")
     mystocks = relationship("MyStock", back_populates="user", cascade="all, delete-orphan")
-    avatars = relationship("Avartar", back_populates="user", cascade="all, delete-orphan")
+    avatars = relationship("Avatar", back_populates="user", cascade="all, delete-orphan")
     def __str__(self) -> str:
         return self.username
