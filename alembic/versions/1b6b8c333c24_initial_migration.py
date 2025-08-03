@@ -1,8 +1,8 @@
-"""init
+"""initial migration
 
-Revision ID: b8e4b60a0e12
+Revision ID: 1b6b8c333c24
 Revises: 
-Create Date: 2025-08-03 00:15:02.685104
+Create Date: 2025-08-03 16:21:38.547783
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'b8e4b60a0e12'
+revision: str = '1b6b8c333c24'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -40,8 +40,8 @@ def upgrade() -> None:
     sa.UniqueConstraint('email')
     )
     op.create_index(op.f('ix_user_id'), 'user', ['id'], unique=False)
-    op.create_table('avartar',
-    sa.Column('loss_ratio', sa.Integer(), nullable=False),
+    op.create_table('avatar',
+    sa.Column('loss', sa.Integer(), nullable=False),
     sa.Column('age', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.String(), nullable=False),
     sa.Column('id', sa.String(), nullable=False),
@@ -49,7 +49,7 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_avartar_id'), 'avartar', ['id'], unique=False)
+    op.create_index(op.f('ix_avatar_id'), 'avatar', ['id'], unique=False)
     op.create_table('interest',
     sa.Column('user_id', sa.String(), nullable=False),
     sa.Column('stock_id', sa.String(), nullable=False),
@@ -98,8 +98,8 @@ def downgrade() -> None:
     op.drop_table('my_stock')
     op.drop_index(op.f('ix_interest_id'), table_name='interest')
     op.drop_table('interest')
-    op.drop_index(op.f('ix_avartar_id'), table_name='avartar')
-    op.drop_table('avartar')
+    op.drop_index(op.f('ix_avatar_id'), table_name='avatar')
+    op.drop_table('avatar')
     op.drop_index(op.f('ix_user_id'), table_name='user')
     op.drop_table('user')
     op.drop_index(op.f('ix_stock_ticker'), table_name='stock')
