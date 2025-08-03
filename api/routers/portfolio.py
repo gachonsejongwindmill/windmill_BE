@@ -5,7 +5,7 @@ from typing import Annotated
 from api.models.user import User
 from api.services.author import auth_service
 from api.services.portfolio import portfolio_service
-from windmill_BE.api.schemas.avatar import AvatarIn,AvatarOut
+from api.schemas.avatar import AvatarIn,AvatarOut
 from api.responses.success_response import success_response
 from api.utils.dependency import get_db
 

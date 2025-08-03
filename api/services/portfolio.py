@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from typing import Annotated
 
 from api.models.user import User
-from windmill_BE.api.models.avatar import Avatar
+from api.models.avatar import Avatar
 from api.services.author import auth_service
-from windmill_BE.api.schemas.avatar import AvatarIn,AvatarOut
+from api.schemas.avatar import AvatarIn,AvatarOut
 from api.utils.dependency import get_db
 
 db_dependency = Annotated[Session,Depends(get_db)]
