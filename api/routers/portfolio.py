@@ -14,6 +14,7 @@ user_dependency = Annotated[User,Depends(auth_service.get_current_user)]
 
 portfolio = APIRouter(prefix="/portfolio", tags=["portfolio"])
 
+@portfolio.post("/avartar", status_code=status.HTTP_200_OK)
 async def add_avartar(db: db_dependency, user: user_dependency, avartar: AvartarIn):
     data = portfolio_service.add_avartar(user,db,avartar)
     return success_response(
