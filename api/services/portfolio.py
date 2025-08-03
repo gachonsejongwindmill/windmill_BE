@@ -30,3 +30,6 @@ class PortfolioService:
             )
         
         return AvartarOut.model_validate(user_avartar)
+    
+
+portfolio_service = PortfolioService()
