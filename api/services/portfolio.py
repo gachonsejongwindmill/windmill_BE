@@ -5,22 +5,22 @@ from typing import Annotated
 from api.models.user import User
 from api.models.avartar import Avartar
 from api.services.author import auth_service
-from api.schemas.avartar import AvartarIn,AvartarOut
+from api.schemas.avartar import AvatarIn,AvatarOut
 from api.utils.dependency import get_db
 
 db_dependency = Annotated[Session,Depends(get_db)]
 user_dependency = Annotated[User,Depends(auth_service.get_current_user)]
 
 class PortfolioService:
-    def add_avartar(self, user: user_dependency, db: db_dependency, avartar: AvartarIn):
-        user_avartar = Avartar(
+    def add_avatar(self, user: user_dependency, db: db_dependency, avartar: AvatarIn):
+        user_avatar = Avartar(
             user_id = user.id,
             age = avartar.age,
             loss = avartar.loss
         )
 
         try:
-            db.add(user_avartar)
+            db.add(user_avatar)
             db.commit()
         except Exception as e:
             db.rollback()
@@ -29,10 +29,10 @@ class PortfolioService:
                 detail="아바타 생성 중 오류가 발생하였습니다"
             )
         
-        return AvartarOut.model_validate(user_avartar)
+        return AvatarOut.model_validate(user_avatar)
     
-    def get_avartar(self, user: user_dependency, db: db_dependency):
+    def get_avatar(self, user: user_dependency, db: db_dependency):
         datas = db.query(Avartar).filter(Avartar.user_id == user.id).all()
-        return [AvartarOut.model_validate(data) for data in datas]
+        return [AvatarOut.model_validate(data) for data in datas]
 
 portfolio_service = PortfolioService()

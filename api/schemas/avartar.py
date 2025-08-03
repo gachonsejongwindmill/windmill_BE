@@ -1,10 +1,10 @@
 from pydantic import BaseModel, ConfigDict
 
-class AvartarIn(BaseModel):
+class AvatarIn(BaseModel):
     loss : int
     age : int
 
-class AvartarOut(AvartarIn):
+class AvatarOut(AvatarIn):
     id : str
     user_id : str
 
