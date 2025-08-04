@@ -30,6 +30,14 @@ async def add_avatar(db: db_dependency, user: user_dependency, avartar: AvatarIn
         data=data
     )
 
+@portfolio.post("/{avatar_id}", status_code=status.HTTP_200_OK)
+async def portfolio_response(db: db_dependency, avatar_id: str):
+    data = portfolio_service.portfolio_response(db, avatar_id)
+    return success_response(
+        message="포트폴리오를 출력합니다",
+        data=data
+    )
+
 @portfolio.delete("/delete_all", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_avatar(db: db_dependency):
     portfolio_service.delete_all_avatar(db)

@@ -27,7 +27,7 @@ class PredictService:
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="예측값을 받아오지 못했습니다"
             )
-        days = feature.period*4
+        days = feature.period*3
         his_data = stock_service.get_price(stock.ticker, days)
         total_data = ai_data + his_data
         sorted_data = sorted(total_data,key=lambda x: x["date"])
@@ -66,7 +66,7 @@ class PredictService:
     def predict_response(self, feature: FeatureOut):
         try:
             response = requests.post(
-                AI_SERVER,
+                f"{AI_SERVER}/run-forecast",
                 json={
                     "string_value": feature.string_value,
                     "int_value1": feature.int_value1,
