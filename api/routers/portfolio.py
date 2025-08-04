@@ -35,3 +35,9 @@ async def delete_all_avatar(db: db_dependency):
     portfolio_service.delete_all_avatar(db)
 
     
+@portfolio.delete("/{avatar_id}", status_code=status.HTTP_200_OK)
+async def delete_avatar(db: db_dependency, avatar_id: str):
+    portfolio_service.delete_avatar(db,avatar_id)
+    return success_response(
+        message=f"{avatar_id}를 삭제했습니다"
+    )
