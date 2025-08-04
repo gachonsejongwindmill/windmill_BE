@@ -30,4 +30,8 @@ async def add_avatar(db: db_dependency, user: user_dependency, avartar: AvatarIn
         data=data
     )
 
+@portfolio.delete("/delete_all", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_all_avatar(db: db_dependency):
+    portfolio_service.delete_all_avatar(db)
 
+    

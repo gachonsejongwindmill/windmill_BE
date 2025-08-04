@@ -35,5 +35,9 @@ class PortfolioService:
     def get_avatar(self, user: user_dependency, db: db_dependency):
         datas = db.query(Avatar).filter(Avatar.user_id == user.id).all()
         return [AvatarOut.model_validate(data) for data in datas]
+    
+    def delete_all_avatar(self, db: db_dependency):
+        avatar = db.query(Avatar).delete()
+        db.commit()
 
 portfolio_service = PortfolioService()
