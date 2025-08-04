@@ -39,5 +39,10 @@ class PortfolioService:
     def delete_all_avatar(self, db: db_dependency):
         avatar = db.query(Avatar).delete()
         db.commit()
-
+    
+    def delete_avatar(self, db: db_dependency, avatar_id: str):
+        avatar = db.query(Avatar).filter(Avatar.id==avatar_id).first()
+        db.delete(avatar)
+        db.commit()
+        
 portfolio_service = PortfolioService()
