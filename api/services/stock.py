@@ -102,4 +102,8 @@ class StockService:
         ]
 
         return historical
+    
+    def get_stock_id_by_ticker(self,db:db_dependency, ticker: str) -> str | None:
+        stock = db.query(Stock).filter(Stock.ticker == ticker).first()
+        return str(stock.id) if stock else None
 stock_service = StockService()
