@@ -12,8 +12,6 @@ from api.routers import route
 from api.models import *
 from api.responses.success_response import success_response
 
-Base.metadata.create_all(engine)
-
 app = FastAPI()
 
 app.include_router(route)
