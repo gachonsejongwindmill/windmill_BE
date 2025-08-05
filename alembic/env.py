@@ -2,7 +2,8 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
+from dotenv import load_dotenv
+load_dotenv()
 from api.utils.database import Base  # Base가 있는 경로에 따라 수정
 from api.models import * # 모든 모델 import 필요
 
@@ -17,6 +18,11 @@ from alembic import context
 # access to the values within the .ini file in use.
 config = context.config
 
+db_url = os.getenv("DATABASE_URL")
+if not db_url:
+    raise ValueError("DATABASE_URL not set")
+
+config.set_main_option("sqlalchemy.url", db_url)
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
