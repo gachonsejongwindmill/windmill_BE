@@ -75,8 +75,8 @@ class PortfolioService:
             response = requests.post(
                 f"{AI_SERVER}/run-predict",
                 json={
-                    "int_value1":value.loss,
-                    "int_value2":value.age
+                    "int_value1":value.age,
+                    "int_value2":value.loss
                 }
                 
             )
