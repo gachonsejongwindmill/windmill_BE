@@ -6,6 +6,5 @@ class StockBase(BaseModel):
 
 class StockOut(StockBase):
     id : str
-
     class Config:
         from_attributes = True
