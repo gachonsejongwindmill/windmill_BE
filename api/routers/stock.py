@@ -65,3 +65,10 @@ async def save_smp(db:db_dependency):
     return success_response(
         message="SMP 500의 저장이 완료되었습니다"
     )
+
+@stock.put("/refresh-price",status_code=status.HTTP_200_OK)
+async def refresh_price(db:db_dependency):
+    stock_service._update_prices_from_yfinance(db)
+    return success_response(
+        message="가격을 갱신하였습니다"
+    )
