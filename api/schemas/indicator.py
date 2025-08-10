@@ -1,10 +1,10 @@
 from pydantic import BaseModel
-
+from typing import Optional
 class IndicatorBase(BaseModel):
     name : str
     ticker : str
-    current : float
-    change_rate : float
+    current : Optional[float] = None
+    change_rate : Optional[float] = None
 
 class IndicatorOut(IndicatorBase):
     id : str
