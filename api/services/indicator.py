@@ -2,7 +2,7 @@
 from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Iterable, Optional, Dict, Any, List, Annotated
-
+import pandas as pd
 import yfinance as yf
 from fastapi import HTTPException, status, Depends
 from sqlalchemy.orm import Session
@@ -39,6 +39,7 @@ class IndicatorService:
         db.commit()
         return {"inserted": inserted, "total": db.query(Indicator).count()}
 
+   
     def update_prices(
         self,
         db: db_dependency,
@@ -48,48 +49,78 @@ class IndicatorService:
         batch_size: int = 20,
     ) -> Dict[str, Any]:
         """
-        yfinance로 최근 2영업일 종가를 가져와 current/등락률(%) 갱신.
-        futures/지수/환율 티커도 그대로 yfinance가 처리.
+        yfinance로 최근 2개 종가를 가져와 current / change_rate(%) 갱신.
         """
+        # 0) 대상 티커 수집
         if tickers is None:
-            tickers = [t[0] for t in db.query(Indicator.ticker).all()]
-        tickers_list: List[str] = list(dict.fromkeys(tickers))  # 중복 제거/순서 유지
+            tickers = [t for (t,) in db.query(Indicator.ticker).all()]
+        tickers_list: List[str] = list(dict.fromkeys([t.strip() for t in tickers if t and t.strip()]))
 
         updated = 0
         skipped: List[str] = []
+        skipped_detail: Dict[str, str] = {}
 
+        def _extract_close_series(df: pd.DataFrame, symbol: str) -> pd.Series:
+            """
+            yfinance가 반환하는 DataFrame에서 특정 symbol의 Close 시리즈를 빼온다.
+            - 단일 심볼: columns가 단순 Index -> df['Close']
+            - 다중 심볼: columns가 MultiIndex -> df['Close'][symbol]
+            """
+            if df.empty:
+                raise ValueError("empty dataframe")
+
+            if isinstance(df.columns, pd.MultiIndex):
+                # 예: columns level0: ['Adj Close','Close',...] / level1: [AAPL, MSFT, ...]
+                if 'Close' not in df.columns.get_level_values(0):
+                    raise KeyError("Close column not found (multiindex)")
+                if symbol not in df['Close'].columns:
+                    raise KeyError(f"symbol {symbol} not in Close columns")
+                s = df['Close'][symbol].dropna()
+            else:
+                # 단일 티커일 때는 Close 컬럼이 바로 존재해야 함
+                if 'Close' not in df.columns:
+                    raise KeyError("Close column not found (single)")
+                s = df['Close'].dropna()
+            return s
+
+        # 1) 배치로 다운로드
         for i in range(0, len(tickers_list), batch_size):
-            chunk = tickers_list[i:i+batch_size]
+            chunk = tickers_list[i:i + batch_size]
             if not chunk:
                 continue
 
-            data = yf.download(
-                " ".join(chunk),
-                period=period,
-                interval=interval,
-                group_by="ticker",
-                auto_adjust=False,
-                threads=True,
-                progress=False,
-            )
+            try:
+                # 리스트 그대로 넘긴다(공백 연결 X) → 특수문자 티커 안전
+                data = yf.download(
+                    tickers=chunk,
+                    period=period,
+                    interval=interval,
+                    group_by="ticker",  # 멀티티커면 MultiIndex, 단일 티커면 일반 컬럼
+                    auto_adjust=False,
+                    threads=True,
+                    progress=False,
+                )
+            except Exception as e:
+                # 이 덩어리 통째로 실패하면 전부 skip
+                for t in chunk:
+                    skipped.append(t)
+                    skipped_detail[t] = f"download error: {repr(e)}"
+                continue
 
+            # 2) 각 티커별로 close 2개 뽑아서 계산/업데이트
             for t in chunk:
                 try:
-                    # 단일 티커일 때는 컬럼 구조가 달라져서 분기
-                    if len(chunk) == 1:
-                        closes = data["Close"].dropna().tail(2)
-                    else:
-                        closes = data[t]["Close"].dropna().tail(2)
-
+                    closes = _extract_close_series(data, t).tail(2)
                     if len(closes) < 2:
                         skipped.append(t)
+                        skipped_detail[t] = "not enough candles (<2)"
                         continue
 
                     prev_close = float(closes.iloc[-2])
                     last_close = float(closes.iloc[-1])
                     change_pct = ((last_close - prev_close) / prev_close * 100.0) if prev_close else 0.0
 
-                    db.execute(
+                    stmt = (
                         update(Indicator)
                         .where(Indicator.ticker == t)
                         .values(
@@ -98,13 +129,17 @@ class IndicatorService:
                             price_updated_at=datetime.now(timezone.utc),
                         )
                     )
+                    db.execute(stmt)
                     updated += 1
-                except Exception:
+
+                except Exception as e:
                     skipped.append(t)
+                    skipped_detail[t] = repr(e)
                     continue
 
         db.commit()
-        return {"updated": updated, "skipped": skipped}
+        return {"updated": updated, "skipped": skipped, "skipped_detail": skipped_detail}
+
     
     def get_indicator(self, db: db_dependency):
         indicators = db.query(Indicator).all()
