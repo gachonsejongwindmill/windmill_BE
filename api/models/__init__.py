@@ -5,3 +5,4 @@ from api.models.stock import Stock
 from api.models.interest import Interest
 from api.models.mystock import MyStock
 from api.models.avatar import Avatar
+from api.models.indicator import Indicator

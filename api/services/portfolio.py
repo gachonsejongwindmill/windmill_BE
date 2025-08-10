@@ -92,7 +92,7 @@ class PortfolioService:
         return transformed
 
         
-    def transform_data(self,db: db_dependency, data):
+    def transform_data(self,db: db_dependency, data: dict):
         data1 = data.get("result",{})
         data2 = data.get("result2",{})
         

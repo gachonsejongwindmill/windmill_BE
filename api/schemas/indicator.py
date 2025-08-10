@@ -1,11 +1,12 @@
 from pydantic import BaseModel
 
-class StockBase(BaseModel):
+class IndicatorBase(BaseModel):
     name : str
     ticker : str
-    price : float
+    current : float
     change_rate : float
-class StockOut(StockBase):
+
+class IndicatorOut(IndicatorBase):
     id : str
     class Config:
         from_attributes = True
