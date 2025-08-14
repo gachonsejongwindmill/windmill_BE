@@ -194,10 +194,13 @@ class StockService:
             }
             for date, price in zip(hist.index, hist["Close"])
         ]
+        historical_sort = sorted(historical,key=lambda x: x["date"])
 
-        return historical
-    
+        return historical_sort
+   
     def get_stock_id_by_ticker(self,db:db_dependency, ticker: str) -> str | None:
         stock = db.query(Stock).filter(Stock.ticker == ticker).first()
         return str(stock.id) if stock else None
+    
+    
 stock_service = StockService()
