@@ -61,7 +61,7 @@ async def get_interest(db: db_dependency, stock_id: str):
 @stock.get("/{stock_id}/{days}", status_code=status.HTTP_200_OK)
 async def get_stock_price(db: db_dependency, stock_id: str, days: int):
     stock = db.query(Stock).filter(Stock.id==stock_id).first()
-    data = stock_service.get_price(db,stock.ticker,days) 
+    data = stock_service.get_price(stock.ticker,days) 
     return success_response(
         message=f"{days}만큼의 데이터를 반환합니다",
         data=data
