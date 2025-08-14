@@ -27,7 +27,7 @@ INDICATOR_SEED = [
     {"name": "WTI 유가",               "ticker": "CL=F"},
     {"name": "Gold 선물",               "ticker": "GC=F"},
 ]
-
+# 가격이 아직 안불러와짐
 class IndicatorService:
     def seed_indicators(self, db: db_dependency) -> Dict[str, int]:
         inserted = 0
