@@ -77,7 +77,11 @@ class PortfolioService:
                 json={
                     "int_value1":value.age,
                     "int_value2":value.loss
-                }
+                },
+                headers={
+                    "ngrok-skip-browser-warning":"true",
+                },
+                allow_redirects=True
                 
             )
         except Exception as e:

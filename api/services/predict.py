@@ -71,7 +71,11 @@ class PredictService:
                     "string_value": feature.string_value,
                     "int_value1": feature.int_value1,
                     "int_value2": feature.int_value2
-                }
+                },
+                headers={
+                    "ngrok-skip-browser-warning":"true",
+                },
+                allow_redirects=True
             )
         except Exception as e:
             raise HTTPException(
