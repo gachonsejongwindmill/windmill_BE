@@ -134,9 +134,11 @@ class PortfolioService:
             for item in data.get("result3", [])
         ]
 
+        transformed_result3 = data.get("result4", "")
         transformed = {
             "result":transformed_result1,
-            "result2":transformed_result2
+            "result2":transformed_result2,
+            "result3":transformed_result3
         }
 
         return transformed
