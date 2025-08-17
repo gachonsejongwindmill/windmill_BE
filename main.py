@@ -17,10 +17,14 @@ app = FastAPI()
 app.include_router(route)
 
 # 프론트와 연결을 위해
-origins = ["https://windmill-w219-gttashl9d-iborys-projects.vercel.app/"]
+origins = [
+    "http://localhost:3000",   # 개발용
+    "https://windmill-w219.vercel.app",  # 배포된 프론트엔드
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://windmill-w219-gttashl9d-iborys-projects.vercel.app/"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
