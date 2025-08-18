@@ -12,14 +12,14 @@ from api.routers import route
 from api.models import *
 from api.responses.success_response import success_response
 
-app = FastAPI(redirect_slashes=False)
+app = FastAPI()
 
 app.include_router(route)
 
 # 프론트와 연결을 위해
 origins = [
     "http://localhost:3000",   # 개발용
-    "https://windmill-w219.vercel.app",  # 배포된 프론트엔드
+    # "https://windmill-w219.vercel.app",  # 배포된 프론트엔드
 ]
 
 app.add_middleware(
