@@ -12,7 +12,7 @@ from api.routers import route
 from api.models import *
 from api.responses.success_response import success_response
 
-app = FastAPI()
+app = FastAPI(redirect_slashes=False)
 
 app.include_router(route)
 
