@@ -16,15 +16,11 @@ app = FastAPI()
 
 app.include_router(route)
 
-# 프론트와 연결을 위해
-origins = [
-    "http://localhost:3000",   # 개발용
-    # "https://windmill-w219.vercel.app",  # 배포된 프론트엔드
-]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins="http://localhost:3000",
+    allow_origin_regex=r"^https://.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
